@@ -22,6 +22,11 @@ const fields = {
         required: true,
         enum: ["CUSTOMER", "PROVIDER"],
     },
+    OTP: {
+        type: String,
+        default: "",
+        select: false,
+    },
 };
 
 // Exporting model

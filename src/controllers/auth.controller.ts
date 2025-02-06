@@ -1,7 +1,8 @@
+import jwt from "jsonwebtoken";
 import { handleAsyncHttp } from "../middleware/handleController";
 import User from "../db/models/User";
 import * as bcrypt from "bcrypt";
-import * as cryptro from "crypto";
+
 import {
     generateAccessToken,
     generateRefreshToken,
@@ -9,6 +10,12 @@ import {
 } from "../lib/jwt.utils";
 import { serverENV } from "../env.server";
 import ErrorHandler from "../middleware/errorHandler";
+import { configDotenv } from "dotenv";
+import { sendEmail } from "../lib/mailer";
+import { generateOTP } from "../lib/utils";
+
+configDotenv();
+
 export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
     const { name, email, userType, password } = req.body;
     const isExists = await User.findOne({ email, userType });
@@ -26,7 +33,7 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
         password: await bcrypt.hash(password, 10),
         userType,
     });
-    res.success("User signup successful", user, 200);
+    res.success("User signup successful", await User.findById(user._id), 200);
 });
 
 export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
@@ -36,9 +43,13 @@ export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
         throw new Error("User doesn't exists");
     }
 
-    if (!(await bcrypt.compare(password, user.password))) {
+    const isValid = await bcrypt.compare(password, user.password);
+    console.log(isValid);
+    if (!isValid) {
         throw new Error("email/password incorrect");
     }
+    // if (!() {
+    // }
 
     const _accessToken = generateAccessToken({
         userId: user._id.toString(),
@@ -62,7 +73,7 @@ export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
         "Login successful",
         {
             user: await User.findById(user._id),
-            accessToke: _accessToken,
+            accessToken: _accessToken,
             refreshToken: _refreshToken,
         },
         200
@@ -91,31 +102,64 @@ export const handleRefreshToken = handleAsyncHttp(async (req, res) => {
 });
 
 export const handleForgotPassword = handleAsyncHttp(async (req, res) => {
-    const { email } = req.body;
+    const { email, userType } = req.body;
 
     // Check if the user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, userType });
     if (!user) {
         throw new ErrorHandler("User  with this email does not exist.", 400);
     }
 
-    // Generate a reset token
-    const token = crypto.randomUUID;
-    await new Token({ userId: user._id, token }).save();
-
-    // Send email with reset link
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-    });
+    const OTP = generateOTP(5);
 
     const mailOptions = {
-        from: process.env.EMAIL,
         to: email,
-        subject: "Password Reset",
-        text: `Click the link to reset your password: http://localhost:${PORT}/reset-password/${token}`,
+        subject: "Password Reset OTP",
+        // text: `Click the link to reset your password: http://localhost:${serverENV.PORT}/api/v1/reset-password/${token}.\nThis token is valid for next 1 hour.`,
+        html: `<div>
+        <p>Your <b>SALOON App</b> password resetting OTP is</p>
+        <br>
+        <h1>${OTP}</h1>
+        </div>`,
     };
+    await sendEmail(mailOptions);
+    user.OTP = OTP;
+    await user.save();
+    res.success("Password resetting OTP sent in your mail.", null, 200);
+});
+
+export const handleVerifyOTP = handleAsyncHttp(async (req, res) => {
+    const { OTP, userType, email } = req.body;
+    const user = await User.findOne({ email, userType }).select("+OTP");
+    if (!user) {
+        throw new ErrorHandler("No user found!", 400);
+    }
+    if (user.OTP !== OTP) {
+        throw new ErrorHandler("Wrong OTP", 400);
+    }
+    user.OTP = "";
+    await user.save();
+    res.success(
+        "OTP verified!",
+        {
+            token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET!, {
+                expiresIn: "1h",
+            }),
+        },
+        200
+    );
+});
+export const handleResetPassword = handleAsyncHttp(async (req, res) => {
+    const { token, password } = req.body;
+    const decode: any = jwt.verify(token, process.env.TOKEN_SECRET!);
+    if (!decode.userId) {
+        throw new Error("Invalid token, userId not found.");
+    }
+    const user = await User.findById(decode.userId).select("+password");
+    if (!user) {
+        throw new Error("User not found.");
+    }
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+    res.success("Password reset successful", null, 200);
 });

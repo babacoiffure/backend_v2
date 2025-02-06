@@ -1,6 +1,7 @@
 import { CorsOptions } from "cors";
+import { configDotenv } from "dotenv";
 import { ServerOptions } from "socket.io";
-
+configDotenv();
 type ServerENV = Readonly<{
     PORT: number;
     NODE_ENV: "production" | "development" | "test" | string;
