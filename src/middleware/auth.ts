@@ -16,7 +16,7 @@ export const authenticateJWT = async (
     ) {
         return next();
     } else {
-        const accessToken = req.cookies.accessToken;
+        const accessToken = req.headers.accessToken || req.cookies.accessToken;
         if (!accessToken) {
             return next(new ErrorHandler("Unauthorized access", 401));
         }

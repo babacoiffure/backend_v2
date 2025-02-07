@@ -27,6 +27,10 @@ const fields = {
         default: "",
         select: false,
     },
+    avatar: {
+        type: String,
+        default: "",
+    },
 };
 
 // Exporting model
