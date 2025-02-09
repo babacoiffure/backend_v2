@@ -8,7 +8,7 @@ import {
     generateRefreshToken,
     verifyRefreshToken,
 } from "../lib/jwt.utils";
-import { serverENV } from "../env.server";
+import { serverENV } from "../env";
 import ErrorHandler from "../middleware/errorHandler";
 import { configDotenv } from "dotenv";
 import { sendEmail } from "../lib/mailer";

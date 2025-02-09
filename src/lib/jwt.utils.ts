@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { serverENV } from "../env.server";
+import { serverENV } from "../env";
 
 export function signJwt(
     object: Object,
@@ -41,14 +41,14 @@ export const generateAccessToken = ({
             userId,
             userType,
         },
-        serverENV.keys.ACCESS_TOKEN_PRIVATE_KEY,
+        serverENV.ACCESS_TOKEN_PRIVATE_KEY,
         {
-            expiresIn: serverENV.intervals.ACCESS_TOKEN_EXPIRE_IN as any,
+            expiresIn: serverENV.ACCESS_TOKEN_EXPIRE_IN as any,
         }
     );
 };
 export const verifyAccessToken = (token: string) =>
-    verifyJwt(token, serverENV.keys.ACCESS_TOKEN_PUBLIC_KEY);
+    verifyJwt(token, serverENV.ACCESS_TOKEN_PUBLIC_KEY);
 
 export const generateRefreshToken = ({
     userId,
@@ -62,11 +62,11 @@ export const generateRefreshToken = ({
             userId,
             userType,
         },
-        serverENV.keys.REFRESH_TOKEN_PRIVATE_KEY,
+        serverENV.REFRESH_TOKEN_PRIVATE_KEY,
         {
-            expiresIn: serverENV.intervals.REFRESH_TOKEN_EXPIRE_IN as any,
+            expiresIn: serverENV.REFRESH_TOKEN_EXPIRE_IN as any,
         }
     );
 };
 export const verifyRefreshToken = (token: string) =>
-    verifyJwt(token, serverENV.keys.REFRESH_TOKEN_PUBLIC_KEY as any);
+    verifyJwt(token, serverENV.REFRESH_TOKEN_PUBLIC_KEY as any);

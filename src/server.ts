@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { serverENV } from "./env.server";
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
@@ -9,12 +9,13 @@ import { connectDB } from "./db";
 import rootRouter from "./router/http-router";
 import ErrorHandler from "./middleware/errorHandler";
 import { errorMiddleware } from "./middleware/errorMiddleware";
+import { serverConfigs, serverENV } from "./env";
 
 const server = express();
 const httpServer = createServer(server);
-const socketServer = new Server(httpServer, serverENV.socket);
+const socketServer = new Server(httpServer, serverConfigs.socket);
 // middleware
-server.use(cors(serverENV.cors));
+server.use(cors(serverConfigs.cors));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
