@@ -48,9 +48,5 @@ export type THttpSuccessFn = (
     result: any,
     status?: number
 ) => void;
-export type THttpErrorFn = (
-    message: string,
-    error: any,
-    status?: number
-) => void;
+export type THttpErrorFn = (message: string, status?: number) => void;
 //
