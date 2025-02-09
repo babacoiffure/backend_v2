@@ -1,7 +1,7 @@
+import fs from "fs";
 import User from "../db/models/User";
 import { uploadImage } from "../lib/cloudinary";
-import { handleAsyncHttp } from "../middleware/handleController";
-import fs from "fs";
+import { handleAsyncHttp } from "../middleware/controller";
 
 export const handleUpdateUserInfo = handleAsyncHttp(async (req, res) => {
     let updatedInfo = {

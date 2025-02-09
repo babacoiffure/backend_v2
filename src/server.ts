@@ -2,28 +2,31 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
+import cors from "cors";
 import { connectDB } from "./db";
-import rootRouter from "./router/http-router";
-import ErrorHandler from "./middleware/errorHandler";
-import { errorMiddleware } from "./middleware/errorMiddleware";
 import { serverConfigs, serverENV } from "./env";
+
+import morgan from "morgan";
+import { errorMiddleware, handleNotFound } from "./middleware/error";
+import rootRouter from "./router/http-router";
 
 const server = express();
 const httpServer = createServer(server);
 const socketServer = new Server(httpServer, serverConfigs.socket);
+
 // middleware
-server.use(cors(serverConfigs.cors));
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
-server.use(cookieParser());
-server.use(morgan("dev"));
+server.use(
+    cors(serverConfigs.cors),
+    express.json(),
+    express.urlencoded({ extended: true }),
+    cookieParser(),
+    morgan("dev")
+);
 
 // initializing router
-server.use(rootRouter);
-server.use(errorMiddleware);
+
+server.use(rootRouter, handleNotFound, errorMiddleware);
 
 // initializing socket events
 

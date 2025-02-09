@@ -1,11 +1,11 @@
-import * as nodemailer from "nodemailer";
 import env from "dotenv";
+import * as nodemailer from "nodemailer";
 env.config();
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.GMAIL_ID,
-        pass: process.env.GMAIL_PASS,
+        user: process.env.NODEMAILER_GMAIL_ID,
+        pass: process.env.NODEMAILER_GMAIL_APP_PASSWORD,
     },
     tls: {
         // Do not fail on invalid certs

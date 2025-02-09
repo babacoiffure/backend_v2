@@ -1,7 +1,7 @@
 // middlewares/validate.ts
 
 import { z } from "zod";
-import { handleAsyncHttp } from "../middleware/handleController";
+import { handleAsyncHttp } from "../middleware/controller";
 
 export const validate = (
     schema: z.AnyZodObject | z.ZodOptional<z.AnyZodObject>

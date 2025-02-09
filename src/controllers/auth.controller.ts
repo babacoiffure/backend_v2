@@ -1,18 +1,18 @@
-import jwt from "jsonwebtoken";
-import { handleAsyncHttp } from "../middleware/handleController";
-import User from "../db/models/User";
 import * as bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../db/models/User";
+import { handleAsyncHttp } from "../middleware/controller";
 
+import { configDotenv } from "dotenv";
+import { serverENV } from "../env";
 import {
     generateAccessToken,
     generateRefreshToken,
     verifyRefreshToken,
-} from "../lib/jwt.utils";
-import { serverENV } from "../env";
-import ErrorHandler from "../middleware/errorHandler";
-import { configDotenv } from "dotenv";
+} from "../lib/jwt";
 import { sendEmail } from "../lib/mailer";
 import { generateOTP } from "../lib/utils";
+import { ErrorHandler } from "../middleware/error";
 
 configDotenv();
 
@@ -20,11 +20,7 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
     const { name, email, userType, password } = req.body;
     const isExists = await User.findOne({ email, userType });
     if (isExists) {
-        return res.error(
-            "User already exists",
-            new Error("User Already exists"),
-            409
-        );
+        throw new ErrorHandler("User Already exists", 409);
     }
 
     const user = await User.create({
@@ -48,8 +44,6 @@ export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
     if (!isValid) {
         throw new Error("email/password incorrect");
     }
-    // if (!() {
-    // }
 
     const _accessToken = generateAccessToken({
         userId: user._id.toString(),
@@ -83,11 +77,11 @@ export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
 export const handleRefreshToken = handleAsyncHttp(async (req, res) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-        return res.error("Forbidden: no refresh token", 401);
+        throw new ErrorHandler("Forbidden: no refresh token", 401);
     }
     const { valid, decoded } = verifyRefreshToken(refreshToken);
     if (!valid || !decoded?.userType || !decoded.userId) {
-        return res.error("Invalid refresh token", 401);
+        throw new ErrorHandler("Invalid refresh token", 401);
     }
     const newAccessToken = generateAccessToken({
         userId: decoded?.userId,

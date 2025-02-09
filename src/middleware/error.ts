@@ -1,6 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import ErrorHandler from "./errorHandler";
 import { serverENV } from "../env";
+
+// Error Handler class
+export class ErrorHandler extends Error {
+    statusCode: number;
+    constructor(message: string, statusCode: number) {
+        super(message);
+        this.statusCode = statusCode;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
 
 export const errorMiddleware = (
     _err: Error | any,
@@ -60,12 +69,19 @@ export const errorMiddleware = (
         new ErrorHandler(`Json Web Token is Expired, Try again `, 400);
     }
 
-    console.log(error);
     _res.status(error.statusCode).json({
         success: false,
         message: error.message,
         error: error,
-        data: null,
+        result: null,
         stack: serverENV.NODE_ENV === "development" ? error.stack : null,
     });
+};
+
+export const handleNotFound = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    throw new ErrorHandler("Resource not found", 404);
 };

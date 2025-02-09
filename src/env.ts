@@ -12,6 +12,10 @@ export const serverENV = cleanEnv(process.env, {
     // Database
     Database_URI: str({ default: "mongodb://127.0.0.1:27017/saloon_db" }),
 
+    // Nodemailer
+    NODEMAILER_GMAIL_ID: str(),
+    NODEMAILER_GMAIL_APP_PASSWORD: str(),
+
     // tokens
     ACCESS_TOKEN_PRIVATE_KEY: str(),
     ACCESS_TOKEN_PUBLIC_KEY: str(),
@@ -32,5 +36,9 @@ export const serverConfigs = Object.freeze({
     cors: {
         origin: "*",
     },
-    wildRoutes: ["/health-check", "/sign-in", "/sign-up"],
+    wildRoutes: [
+        "/auth/credential/sign-in",
+        "/auth/credential/sign-up",
+        "/health-check",
+    ],
 });

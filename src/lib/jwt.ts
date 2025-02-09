@@ -1,6 +1,12 @@
 import jwt from "jsonwebtoken";
 import { serverENV } from "../env";
 
+// Token schema
+type TokenSchema = {
+    userId: string;
+    userType: string;
+};
+
 export function signJwt(
     object: Object,
     privateKey: string,
@@ -12,13 +18,16 @@ export function signJwt(
     });
 }
 
-export function verifyJwt(token: string, publicKey: string) {
+export function verifyJwt<TokenSchema>(token: string, publicKey: string) {
     try {
-        const decoded = jwt.verify(token, publicKey);
+        const decoded: any = jwt.verify(token, publicKey);
         return {
             valid: true,
-            expired: false,
-            decoded: decoded as { userId: string; userType: string },
+            expired: decoded?.exp < Date.now(),
+            decoded: decoded as TokenSchema & {
+                iat: number;
+                exp: number;
+            },
         };
     } catch (e: any) {
         return {
@@ -29,6 +38,7 @@ export function verifyJwt(token: string, publicKey: string) {
     }
 }
 
+// Access Token
 export const generateAccessToken = ({
     userId,
     userType,
@@ -48,15 +58,10 @@ export const generateAccessToken = ({
     );
 };
 export const verifyAccessToken = (token: string) =>
-    verifyJwt(token, serverENV.ACCESS_TOKEN_PUBLIC_KEY);
+    verifyJwt<TokenSchema>(token, serverENV.ACCESS_TOKEN_PUBLIC_KEY);
 
-export const generateRefreshToken = ({
-    userId,
-    userType,
-}: {
-    userId: string;
-    userType: string;
-}) => {
+// Refresh token
+export const generateRefreshToken = ({ userId, userType }: TokenSchema) => {
     return signJwt(
         {
             userId,
@@ -69,4 +74,4 @@ export const generateRefreshToken = ({
     );
 };
 export const verifyRefreshToken = (token: string) =>
-    verifyJwt(token, serverENV.REFRESH_TOKEN_PUBLIC_KEY as any);
+    verifyJwt<TokenSchema>(token, serverENV.REFRESH_TOKEN_PUBLIC_KEY);

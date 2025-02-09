@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { ErrorHandler } from "./error";
 
 export const handleAsyncHttp =
     (
         func: (
             req: Request,
-            customResFn: THttpResponse,
+            albiResponse: AlbiResponse,
             res: Response,
             next: NextFunction
         ) => void
@@ -21,31 +22,11 @@ export const handleAsyncHttp =
                 result,
                 error: null,
             };
-            // console.log(
-            //     ` \nResponse : ${JSON.stringify(
-            //         {
-            //             success: true,
-            //             message,
-            //             result,
-            //             error: null,
-            //         },
-            //         null,
-            //         2
-            //     )}\n`
-            // );
+
             return res.status(status).json(response);
         };
-        const error = async (
-            message: string,
-            error: any,
-            status: number = 400
-        ) => {
-            res.status(status).json({
-                success: false,
-                message,
-                error,
-                result: null,
-            });
+        const error = async (message: string, status: number = 400) => {
+            throw new ErrorHandler(message, status);
         };
         const response = {
             success,
@@ -57,7 +38,7 @@ export const handleAsyncHttp =
     };
 
 // Types
-export type THttpResponse = {
+export type AlbiResponse = {
     success: THttpSuccessFn;
     error: THttpErrorFn;
     default: Response;
