@@ -6,7 +6,7 @@ const fields = {
         type: String,
         required: true,
     },
-    createdBy: {
+    ownerId: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
         required: true,
