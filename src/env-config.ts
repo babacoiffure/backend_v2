@@ -27,7 +27,7 @@ export const serverENV = cleanEnv(process.env, {
 
 export const serverConfigs = Object.freeze({
     app: {
-        name: "SALOON App",
+        name: "Saloon",
     },
     socket: {
         path: "",

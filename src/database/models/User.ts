@@ -18,8 +18,14 @@ const fields = {
         unique: true,
     },
     avatar: {
-        type: String,
-        default: "",
+        publicId: {
+            type: String,
+            default: "",
+        },
+        secureURL: {
+            type: String,
+            default: "",
+        },
     },
     password: {
         type: String,
@@ -29,7 +35,7 @@ const fields = {
     userType: {
         type: String,
         required: true,
-        enum: ["CLIENT", "PROVIDER"],
+        enum: ["Client", "Provider"],
     },
     OTP: {
         type: String,

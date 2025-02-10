@@ -13,7 +13,7 @@ export const generateRandomNumber = (digit: number) => {
     let randomNum = "";
     let possible = "0123456789";
 
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < digit; i++) {
         randomNum += possible.charAt(
             Math.floor(Math.random() * possible.length)
         );

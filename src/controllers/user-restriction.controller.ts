@@ -7,7 +7,7 @@ export const handleBlockUser = handleAsyncHttp(async (req, res) => {
     let restriction = await UserRestriction.findOne({
         from,
         to,
-        actionType: "BLOCK",
+        actionType: "Block",
     });
     if (restriction) {
         return res.error("Already blocked", 400);
@@ -15,7 +15,7 @@ export const handleBlockUser = handleAsyncHttp(async (req, res) => {
     restriction = await UserRestriction.create({
         from,
         to,
-        actionType: "BLOCK",
+        actionType: "Block",
     });
     res.success("Blocked.", null, 200);
 });
@@ -24,7 +24,7 @@ export const handleUnBlockUser = handleAsyncHttp(async (req, res) => {
     let restriction = await UserRestriction.findOne({
         from,
         to,
-        actionType: "BLOCK",
+        actionType: "Block",
     });
     if (!restriction) {
         return res.error("Not blocked yet.", 400);
@@ -37,7 +37,7 @@ export const handleGetBlockListByUserId = handleAsyncHttp(async (req, res) => {
     const list = await queryHelper(UserRestriction, {
         ...req.query,
         from: req.params.userId,
-        actionType: "BLOCK",
+        actionType: "Block",
     });
     res.success("User block list", list);
 });
@@ -51,7 +51,7 @@ export const handleReportUser = handleAsyncHttp(async (req, res) => {
     await UserRestriction.create({
         from,
         to,
-        actionType: "REPORT",
+        actionType: "Report",
         report: {
             reason,
             note,

@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { configDotenv } from "dotenv";
+import fs from "fs";
+import { serverConfigs } from "../env-config";
 
 configDotenv();
 cloudinary.config({
@@ -8,35 +10,18 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
-export const uploadImage = async (imagePath: string) => {
-    return await cloudinary.uploader.upload(imagePath, {
-        public_id: "avatar",
+export const destroyImage = async (publicId: string) =>
+    cloudinary.uploader.destroy(publicId);
+
+export const uploadImage = async (imagePath: string, folderName = "Photos") => {
+    let data = await cloudinary.uploader.upload(imagePath, {
+        folder: `${folderName}-${serverConfigs.app.name}`,
     });
+    await removeFile(imagePath);
+    return data;
 };
 
-// (async function() {
-
-//     // Configuration
-
-//     // Upload an image
-
-//     console.log(uploadResult);
-
-//     // Optimize delivery by resizing and applying auto-format and auto-quality
-//     const optimizeUrl = cloudinary.url('shoes', {
-//         fetch_format: 'auto',
-//         quality: 'auto'
-//     });
-
-//     console.log(optimizeUrl);
-
-//     // Transform the image: auto-crop to square aspect_ratio
-//     const autoCropUrl = cloudinary.url('shoes', {
-//         crop: 'auto',
-//         gravity: 'auto',
-//         width: 500,
-//         height: 500,
-//     });
-
-//     console.log(autoCropUrl);
-// })();
+export const removeFile = async (path: string) =>
+    fs.unlink(path, (err) => {
+        console.log(err);
+    });

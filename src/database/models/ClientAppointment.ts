@@ -2,36 +2,35 @@ import mongoose, { model, Schema } from "mongoose";
 
 // Insert table fields here
 const fields = {
-    from: {
+    providerId: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
         required: true,
     },
-    to: {
+    clientId: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
         required: true,
     },
-    actionType: {
+    timeTaken: {
+        startAt: {
+            type: Date,
+            required: true,
+        },
+        endAt: {
+            type: Date,
+            required: true,
+        },
+    },
+    status: {
         type: String,
-        enum: ["Block", "Report"],
-        required: true,
-    },
-    report: {
-        reason: {
-            type: String,
-            default: "Not mentioned",
-        },
-        note: {
-            type: String,
-            default: "",
-        },
+        enums: ["Accepted", "Pending"],
     },
 };
 
 // Exporting model
 export default model(
-    "UserRestriction",
+    "ClientAppointment",
     new Schema(fields, {
         timestamps: true,
     })
