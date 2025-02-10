@@ -20,12 +20,16 @@ const fields = {
     userType: {
         type: String,
         required: true,
-        enum: ["CUSTOMER", "PROVIDER"],
+        enum: ["CLIENT", "PROVIDER"],
     },
     OTP: {
         type: String,
         default: "",
         select: false,
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false,
     },
     avatar: {
         type: String,

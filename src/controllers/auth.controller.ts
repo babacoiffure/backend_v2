@@ -4,7 +4,7 @@ import User from "../db/models/User";
 import { handleAsyncHttp } from "../middleware/controller";
 
 import { configDotenv } from "dotenv";
-import { serverENV } from "../env";
+import { serverConfigs, serverENV } from "../env-config";
 import {
     generateAccessToken,
     generateRefreshToken,
@@ -29,20 +29,45 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
         password: await bcrypt.hash(password, 10),
         userType,
     });
-    res.success("User signup successful", await User.findById(user._id), 200);
+    const OTP = generateOTP(5);
+
+    const mailOptions = {
+        to: email,
+        subject: "Email verification OTP",
+        html: `<div>
+        <p>Your <b>${serverConfigs.app.name}</b> password resetting OTP is</p>
+        <br>
+        <h1>${OTP}</h1>
+        </div>`,
+    };
+    await sendEmail(mailOptions);
+    user.OTP = OTP;
+    await user.save();
+    res.success(
+        "User signup successful!\nWe send a mail with OTP to verify your mail.Please verify your mail before logging in.",
+        await User.findById(user._id),
+        200
+    );
 });
 
 export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
     const { email, password, userType } = req.body;
-    const user = await User.findOne({ email, userType }).select("+password");
+    const user = await User.findOne({ email, userType }).select([
+        "+password",
+        "+otp",
+    ]);
     if (!user) {
-        throw new Error("User doesn't exists");
+        return res.error("User doesn't exists", 400);
+    }
+
+    if (!user.emailVerified) {
+        return res.error("Please verify your mail first!", 400);
     }
 
     const isValid = await bcrypt.compare(password, user.password);
-    console.log(isValid);
+
     if (!isValid) {
-        throw new Error("email/password incorrect");
+        return res.error("email/password incorrect", 400);
     }
 
     const _accessToken = generateAccessToken({
@@ -63,13 +88,27 @@ export const handleCredentialSignIn = handleAsyncHttp(async (req, res) => {
         secure: serverENV.NODE_ENV === "production",
         sameSite: "strict",
     });
+    res.success("Login successful", await User.findById(user._id), 200);
+});
+
+export const handleVerifyEmailWithOTP = handleAsyncHttp(async (req, res) => {
+    const { OTP, email, userType } = req.body;
+    const user = await User.findOne({
+        email,
+        userType,
+    });
+
+    if (!user) {
+        return res.error("User not identified by this email and userType", 404);
+    }
+    if (!user.OTP == OTP) {
+        return res.error("Wrong OTP", 400);
+    }
+    user.emailVerified = true;
+    await user.save();
     res.success(
-        "Login successful",
-        {
-            user: await User.findById(user._id),
-            accessToken: _accessToken,
-            refreshToken: _refreshToken,
-        },
+        "OTP matched for email verification. Your email now verified.",
+        null,
         200
     );
 });
@@ -95,6 +134,7 @@ export const handleRefreshToken = handleAsyncHttp(async (req, res) => {
     res.success("Token refreshed", { refreshToken });
 });
 
+// Handle Password reset
 export const handleForgotPassword = handleAsyncHttp(async (req, res) => {
     const { email, userType } = req.body;
 
@@ -111,7 +151,7 @@ export const handleForgotPassword = handleAsyncHttp(async (req, res) => {
         subject: "Password Reset OTP",
         // text: `Click the link to reset your password: http://localhost:${serverENV.PORT}/api/v1/reset-password/${token}.\nThis token is valid for next 1 hour.`,
         html: `<div>
-        <p>Your <b>SALOON App</b> password resetting OTP is</p>
+        <p>Your <b>${serverConfigs.app.name}</b> password resetting OTP is</p>
         <br>
         <h1>${OTP}</h1>
         </div>`,
@@ -143,6 +183,7 @@ export const handleVerifyOTP = handleAsyncHttp(async (req, res) => {
         200
     );
 });
+
 export const handleResetPassword = handleAsyncHttp(async (req, res) => {
     const { token, password } = req.body;
     const decode: any = jwt.verify(token, process.env.TOKEN_SECRET!);

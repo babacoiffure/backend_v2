@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { serverConfigs } from "../env";
+import { serverConfigs } from "../env-config";
 import { verifyAccessToken } from "../lib/jwt";
 import { ErrorHandler } from "./error";
 
@@ -9,7 +9,8 @@ export const authenticateJWT = async (
     next: NextFunction
 ) => {
     // check for wild routes
-    if (serverConfigs.wildRoutes.includes(req.path)) return next();
+    if (serverConfigs.wildRoutes.some((x) => req.path.includes(x)))
+        return next();
 
     // check for accessToken
     let accessToken = req.cookies["accessToken"];

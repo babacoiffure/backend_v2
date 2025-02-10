@@ -26,7 +26,9 @@ export const serverENV = cleanEnv(process.env, {
 });
 
 export const serverConfigs = Object.freeze({
-    app: {},
+    app: {
+        name: "SALOON App",
+    },
     socket: {
         path: "",
         cors: {
@@ -37,8 +39,12 @@ export const serverConfigs = Object.freeze({
         origin: "*",
     },
     wildRoutes: [
-        "/auth/credential/sign-in",
-        "/auth/credential/sign-up",
+        "/sign-in",
+        "/verify-email-with-otp",
+        "/sign-up",
         "/health-check",
+        "/forgot-password",
+        "/verify-identity-with-otp",
+        "/reset-password",
     ],
 });

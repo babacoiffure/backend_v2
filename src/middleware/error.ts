@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { serverENV } from "../env";
+import { serverENV } from "../env-config";
 
 // Error Handler class
 export class ErrorHandler extends Error {

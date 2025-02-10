@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { serverENV } from "../env";
+import { serverENV } from "../env-config";
 
 // Token schema
 type TokenSchema = {
