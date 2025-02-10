@@ -1,6 +1,6 @@
 import UserRestriction from "../db/models/UserRestriction";
-import queryHelper from "../lib/query-helper";
 import { handleAsyncHttp } from "../middleware/controller";
+import queryHelper from "../utils/query-helper";
 
 export const handleBlockUser = handleAsyncHttp(async (req, res) => {
     const { from, to } = req.body;

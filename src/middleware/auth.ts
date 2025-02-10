@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { serverConfigs } from "../env-config";
-import { verifyAccessToken } from "../lib/jwt";
+import { verifyAccessToken } from "../utils/jwt";
 import { ErrorHandler } from "./error";
 
 export const authenticateJWT = async (

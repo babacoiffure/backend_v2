@@ -13,7 +13,7 @@ export const handleAsyncHttp =
     (req: Request, res: Response, next: NextFunction) => {
         const success = async (
             message: string,
-            result: any,
+            result: any = null,
             status: number = 200
         ) => {
             const response = {
@@ -45,7 +45,7 @@ export type AlbiResponse = {
 };
 export type THttpSuccessFn = (
     message: string,
-    result: any,
+    result?: any,
     status?: number
 ) => void;
 export type THttpErrorFn = (message: string, status?: number) => void;
