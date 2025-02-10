@@ -51,7 +51,7 @@ const User = model(
 // Exporting model
 
 export async function generateUniqueUID(name: string) {
-    let uid = name.split(" ").join("-");
+    let uid = name.split(" ").join("-").toLowerCase();
     let isExist = await User.findOne({ uid });
     if (isExist) {
         uid = await generateUniqueUID(uid + generateRandomNumber(1));
