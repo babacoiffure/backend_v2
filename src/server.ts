@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { connectDB } from "./db";
+import { connectDB } from "./database";
 import { serverConfigs, serverENV } from "./env-config";
 
 import morgan from "morgan";

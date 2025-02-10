@@ -1,4 +1,4 @@
-import UserRestriction from "../db/models/UserRestriction";
+import UserRestriction from "../database/models/UserRestriction";
 import { handleAsyncHttp } from "../middleware/controller";
 import queryHelper from "../utils/query-helper";
 

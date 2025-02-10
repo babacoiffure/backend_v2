@@ -1,11 +1,11 @@
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User, { generateUniqueUID } from "../db/models/User";
+import User, { generateUniqueUID } from "../database/models/User";
 import { handleAsyncHttp } from "../middleware/controller";
 
 import { configDotenv } from "dotenv";
 import { serverConfigs, serverENV } from "../env-config";
-import { sendEmail } from "../lib/mailer";
+import { sendEmail } from "../libraries/mailer";
 import { ErrorHandler } from "../middleware/error";
 import {
     generateAccessToken,
