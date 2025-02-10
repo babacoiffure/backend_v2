@@ -1,18 +1,18 @@
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../db/models/User";
+import User, { generateUniqueUID } from "../db/models/User";
 import { handleAsyncHttp } from "../middleware/controller";
 
 import { configDotenv } from "dotenv";
 import { serverConfigs, serverENV } from "../env-config";
+import { sendEmail } from "../lib/mailer";
+import { ErrorHandler } from "../middleware/error";
 import {
     generateAccessToken,
     generateRefreshToken,
     verifyRefreshToken,
-} from "../lib/jwt";
-import { sendEmail } from "../lib/mailer";
-import { generateOTP } from "../lib/utils";
-import { ErrorHandler } from "../middleware/error";
+} from "../utils/jwt";
+import { generateOTP } from "../utils/utils";
 
 configDotenv();
 
@@ -28,6 +28,7 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
         email,
         password: await bcrypt.hash(password, 10),
         userType,
+        uid: await generateUniqueUID(name),
     });
     const OTP = generateOTP(5);
 
