@@ -2,6 +2,7 @@ import fs from "fs";
 import User from "../database/models/User";
 import { uploadImage } from "../libraries/cloudinary";
 import { handleAsyncHttp } from "../middleware/controller";
+import queryHelper from "../utils/query-helper";
 
 export const handleUpdateUserInfo = handleAsyncHttp(async (req, res) => {
     let updatedInfo = {
@@ -22,4 +23,9 @@ export const handleUpdateUserInfo = handleAsyncHttp(async (req, res) => {
     });
 
     res.success("Updated user info", user, 200);
+});
+
+export const handleGetUserList = handleAsyncHttp(async (req, res) => {
+    const list = await queryHelper(User, req.query);
+    res.success("User list", list);
 });

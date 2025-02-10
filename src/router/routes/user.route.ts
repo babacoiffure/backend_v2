@@ -1,7 +1,10 @@
 import { Router } from "express";
 import multer from "multer";
-import { handleUpdateUserInfo } from "../../controllers/user.controller";
 import path from "path";
+import {
+    handleGetUserList,
+    handleUpdateUserInfo,
+} from "../../controllers/user.controller";
 export const userRouter = Router();
 
 // Set up storage engine with multer
@@ -43,3 +46,5 @@ userRouter.post(
     upload.single("avatar"),
     handleUpdateUserInfo
 );
+
+userRouter.get("/list", handleGetUserList);
