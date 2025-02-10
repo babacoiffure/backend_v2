@@ -6,6 +6,11 @@ const fields = {
         type: String,
         required: true,
     },
+    appointmentType: {
+        type: String,
+        enums: ["Regular", "Pre-deposit", "Confirmation"],
+        required: true,
+    },
     ownerId: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
@@ -61,6 +66,10 @@ const fields = {
     ],
     addons: [
         {
+            isActive: {
+                type: Boolean,
+                default: true,
+            },
             name: {
                 type: String,
                 required: true,
@@ -79,6 +88,10 @@ const fields = {
             },
             sizes: [
                 {
+                    isActive: {
+                        type: Boolean,
+                        default: true,
+                    },
                     size: {
                         type: String,
                         required: true,

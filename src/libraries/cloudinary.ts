@@ -21,7 +21,23 @@ export const uploadImage = async (imagePath: string, folderName = "Photos") => {
     return data;
 };
 
-export const removeFile = async (path: string) =>
-    fs.unlink(path, (err) => {
-        console.log(err);
+export const removeFile = async (filePath: string) =>
+    // Check if the file exists
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            // File does not exist
+            console.log("File doesn't exists.");
+            return;
+        }
+
+        // File exists, proceed to delete it
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                // Handle error during file deletion
+                console.log("Problem on deleting", err);
+                return;
+            }
+            // File deleted successfully
+            console.log("Successfully Deleted.");
+        });
     });
