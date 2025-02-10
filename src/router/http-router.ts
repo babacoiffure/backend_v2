@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateJWT } from "../middleware/auth";
 import { authRouter } from "./routes/auth.route";
-import { userRestrictionRouter } from "./routes/user-restriction";
+import { userRestrictionRouter } from "./routes/user-restriction.route";
 import { userRouter } from "./routes/user.route";
 
 const rootRouter = Router();
