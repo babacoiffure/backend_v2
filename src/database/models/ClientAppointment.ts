@@ -12,20 +12,41 @@ const fields = {
         ref: "User",
         required: true,
     },
-    timeTaken: {
-        startAt: {
-            type: Date,
-            required: true,
-        },
-        endAt: {
-            type: Date,
-            required: true,
-        },
+    scheduleDate: {
+        type: Date,
+        required: true,
+    },
+    timePeriod: {
+        type: String,
+        required: true,
     },
     status: {
         type: String,
         enums: ["Accepted", "Pending"],
+        default: "Pending",
     },
+    rescheduleProposals: [
+        {
+            from: {
+                type: String,
+                enums: ["Client", "Provider"],
+            },
+            date: {
+                type: Date,
+                required: true,
+            },
+            timePeriod: {
+                startAt: {
+                    type: Date,
+                    required: true,
+                },
+                endAt: {
+                    type: Date,
+                    required: true,
+                },
+            },
+        },
+    ],
 };
 
 // Exporting model
