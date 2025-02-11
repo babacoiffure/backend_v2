@@ -46,6 +46,14 @@ const fields = {
         type: Boolean,
         default: false,
     },
+    providerSettings: {
+        appointmentMode: {
+            type: String,
+            enums: ["Regular", "Pre-deposit", "Confirmation"],
+            default: "Confirmation",
+            required: true,
+        },
+    },
 };
 
 const User = model(

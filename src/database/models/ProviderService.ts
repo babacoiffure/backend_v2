@@ -6,11 +6,6 @@ const fields = {
         type: String,
         required: true,
     },
-    appointmentType: {
-        type: String,
-        enums: ["Regular", "Pre-deposit", "Confirmation"],
-        required: true,
-    },
     ownerId: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
