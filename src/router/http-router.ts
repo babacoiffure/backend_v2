@@ -3,6 +3,7 @@ import { authenticateJWT } from "../middleware/auth";
 import { authRouter } from "./routes/auth.route";
 import { chatRouter } from "./routes/chat.route";
 import { fileUploadRouter } from "./routes/file-upload.route";
+import { providerScheduleRouter } from "./routes/provider-schedule.route";
 import { providerServiceRouter } from "./routes/provider-service.route";
 import { userRestrictionRouter } from "./routes/user-restriction.route";
 import { userRouter } from "./routes/user.route";
@@ -18,6 +19,7 @@ v1Router.use("/user-restriction", userRestrictionRouter);
 v1Router.use("/provider-service", providerServiceRouter);
 v1Router.use("/file-upload", fileUploadRouter);
 v1Router.use("/chat", chatRouter);
+v1Router.use("/provider-schedule", providerScheduleRouter);
 
 // health check
 v1Router.get("/health-check", (req, res) => {

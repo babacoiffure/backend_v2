@@ -19,19 +19,13 @@ const fields = {
             enum: ["Provider", "Client", "No Matter"],
         },
     ],
-    selectedTimes: [
+    timePeriods: [
         {
-            startAt: {
-                type: Date,
-                required: true,
-            },
-            endAt: {
-                type: Date,
-                required: true,
-            },
+            type: String,
+            required: true,
         },
     ],
-    isRepeatingTimeEveryday: {
+    everydayRepeatTimePeriod: {
         type: Boolean,
         required: true,
     },
