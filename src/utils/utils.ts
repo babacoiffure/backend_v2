@@ -20,3 +20,16 @@ export const generateRandomNumber = (digit: number) => {
     }
     return Number(randomNum);
 };
+
+export function getDayMatchQuery(targetDate: Date) {
+    // Create the start and end of the day
+    const startOfDay = new Date(targetDate);
+    startOfDay.setHours(0, 0, 0, 0); // Set to 00:00:00.000
+
+    const endOfDay = new Date(targetDate);
+    endOfDay.setHours(23, 59, 59, 999); // Set to 23:59:59.999
+    return {
+        $gte: startOfDay,
+        $lt: endOfDay,
+    };
+}

@@ -9,3 +9,10 @@ export const notificationEvents = {
     sendUserNotificationUpdate: (userId: string) =>
         `user/notification-update/${userId}`,
 };
+
+export const appointmentEvents = {
+    sendAppointmentRescheduleProposal: (appointmentId: string) =>
+        `appointment/${appointmentId}/reschedule-proposal`,
+    appointmentProposalAccept: (appointmentId: string) =>
+        `appointment/${appointmentId}/proposal-accept`,
+};

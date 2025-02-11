@@ -4,9 +4,11 @@ import { socketServer } from "../server";
 
 export const sendUserNotification = async (
     userId: string,
+    title: string,
     data: Record<string, any>
 ) => {
     const notification = await UserNotification.create({
+        title,
         userId,
         data,
     });

@@ -1,5 +1,9 @@
 import mongoose, { model, Schema } from "mongoose";
 const fields = {
+    title: {
+        type: String,
+        required: true,
+    },
     userId: {
         type: mongoose.Types.ObjectId,
         required: true,

@@ -31,19 +31,13 @@ const fields = {
                 type: String,
                 enums: ["Client", "Provider"],
             },
-            date: {
+            scheduleDate: {
                 type: Date,
                 required: true,
             },
             timePeriod: {
-                startAt: {
-                    type: Date,
-                    required: true,
-                },
-                endAt: {
-                    type: Date,
-                    required: true,
-                },
+                type: String,
+                required: true,
             },
         },
     ],
