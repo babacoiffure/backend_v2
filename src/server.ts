@@ -10,10 +10,11 @@ import { serverConfigs, serverENV } from "./env-config";
 import morgan from "morgan";
 import { errorMiddleware, handleNotFound } from "./middleware/error";
 import rootRouter from "./router/http-router";
+import { wsManager } from "./router/socket-manager";
 
 const server = express();
 const httpServer = createServer(server);
-const socketServer = new Server(httpServer, serverConfigs.socket);
+export const socketServer = new Server(httpServer, serverConfigs.socket);
 
 // middleware
 server.use(
@@ -29,6 +30,7 @@ server.use(
 server.use(rootRouter, handleNotFound, errorMiddleware);
 
 // initializing socket events
+wsManager.initialize(socketServer);
 
 async function startServer() {
     try {

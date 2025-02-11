@@ -1,19 +1,32 @@
 import { randomUUID } from "crypto";
-import { Event, Server, Socket } from "socket.io";
-import { TSocketControllerContext, TSocketEvent } from "../types";
+import { Server, Socket } from "socket.io";
+import { TSocketControllerContext } from "../types";
+import { TSocketEvent } from "../types/index";
 
-export class WSManager {
+export class WSEvents {
     events: TSocketEvent[] = [];
-
     constructor() {}
 
-    // Register an event and return the instance for chaining
-    registerEvent(
+    addEvent(
         name: string,
         controller: (context: TSocketControllerContext, payload: any[]) => void,
         logger?: (context: TSocketControllerContext, payload: any[]) => void
     ): this {
         this.events.push({ name, controller, logger });
+        return this; // Return the instance for chaining
+    }
+}
+
+export class WSManager {
+    events: TSocketEvent[] = [];
+    context: TSocketControllerContext | null = null;
+    constructor() {}
+
+    // Register an event and return the instance for chaining
+    addEvents(eventPath: string, events: TSocketEvent[]): this {
+        this.events = this.events.concat(
+            events.map((x) => ({ ...x, name: `${eventPath}${x.name}` }))
+        );
         return this; // Return the instance for chaining
     }
 
@@ -36,6 +49,7 @@ export class WSManager {
                     },
                     auth: socket.handshake.headers as any, // Adjust this type based on your auth headers structure
                 };
+                this.context = context;
 
                 socket.on(event.name, (...payload: any[]) => {
                     event.controller(context, payload);
