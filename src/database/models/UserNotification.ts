@@ -1,0 +1,23 @@
+import mongoose, { model, Schema } from "mongoose";
+const fields = {
+    userId: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
+    isRead: {
+        type: Boolean,
+        default: false,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    data: {
+        type: Object,
+        required: true,
+    },
+};
+export default model(
+    "UserNotification",
+    new Schema(fields, { timestamps: true })
+);

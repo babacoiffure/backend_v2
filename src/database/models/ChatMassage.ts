@@ -36,4 +36,7 @@ const fields = {
         },
     },
 };
+export const getReceiverId = (senderId: string, ids: string[]) =>
+    ids.find((x) => x.toString() !== senderId) ?? "";
+
 export default model("ChatMessage", new Schema(fields, { timestamps: true }));

@@ -1,8 +1,9 @@
 import { chatEvents } from "../constants/ws-events";
 import Chat from "../database/models/Chat";
-import ChatMassage from "../database/models/ChatMassage";
+import ChatMassage, { getReceiverId } from "../database/models/ChatMassage";
 import { handleAsyncHttp } from "../middleware/controller";
 import { socketServer } from "../server";
+import { sendUserNotification } from "../service/notification.service";
 import queryHelper from "../utils/query-helper";
 export const handleGetChatByUserIds = handleAsyncHttp(async (req, res) => {
     let chat = await Chat.findOne({ userIds: req.body.chatIds });
@@ -26,6 +27,11 @@ export const handleSendChatMessage = handleAsyncHttp(async (req, res) => {
     });
     socketServer.emit(chatEvents.chatNewMessage(chatId), message);
     // send notification by socket
+    let receiverId = getReceiverId(senderId, chat.userIds as any);
+    await sendUserNotification(receiverId, {
+        message: "New Message",
+        data: message,
+    });
     res.success("message sent", message);
 });
 export const handleEditChatMessage = handleAsyncHttp(async (req, res) => {
