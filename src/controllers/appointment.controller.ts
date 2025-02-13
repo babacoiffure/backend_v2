@@ -1,5 +1,5 @@
 import { appointmentEvents } from "../constants/ws-events";
-import ClientAppointment from "../database/models/ClientAppointment";
+import Appointment from "../database/models/Appointment";
 import User from "../database/models/User";
 import { handleAsyncHttp } from "../middleware/controller";
 import { socketServer } from "../server";
@@ -7,22 +7,34 @@ import { sendUserNotification } from "../service/notification.service";
 import queryHelper from "../utils/query-helper";
 import { getDayMatchQuery } from "../utils/utils";
 
-export const handleMakeClientAppointment = handleAsyncHttp(async (req, res) => {
-    const isExists = await ClientAppointment.findOne({
+export const handleMakeAppointment = handleAsyncHttp(async (req, res) => {
+    const isExists = await Appointment.findOne({
         scheduleDate: getDayMatchQuery(req.body.scheduleDate),
         timePeriod: req.body.timePeriod,
+        status: "Accepted",
     });
     if (isExists) {
-        res.error("The timePeriod of this schedule already taken.", 400);
+        return res.error("The timePeriod of this schedule already taken.", 400);
     }
 
-    const provider = await User.findById(isExists?.providerId);
+    // const isAlreadyTakeAnAppointment = await Appointment.findOne({
+    //     scheduleDate: getDayMatchQuery(req.body.scheduleDate),
+    //     timePeriod: req.body.timePeriod,
+    //     clientId:req.body.clientId
+    // });
+
+    // if (isAlreadyTakeAnAppointment) {
+    //     return res.error("The timePeriod of this schedule already taken.", 400);
+    // }
+
+    const provider = await User.findById(req.body.providerId);
     const appointmentMode = provider?.providerSettings?.appointmentMode;
     if (appointmentMode === "Pre-deposit") {
         // check the token give in req.body. and after payment we will save the payment record in payment model. and we give a trx token. we have to validate this trx token here
     }
-    const appointment = await ClientAppointment.create({
+    const appointment = await Appointment.create({
         status: appointmentMode === "Confirmation" ? "Pending" : "Accepted",
+        ...req.body,
     });
     await sendUserNotification(
         appointment.clientId.toString(),
@@ -40,9 +52,9 @@ export const handleMakeClientAppointment = handleAsyncHttp(async (req, res) => {
 export const handleProposeForRescheduleAppointment = handleAsyncHttp(
     async (req, res) => {
         const { id, proposal } = req.body;
-        const appointment = await ClientAppointment.findById(id);
+        const appointment = await Appointment.findById(id);
         if (!appointment) {
-            return res.error("No appointment", 400);
+            return res.error("No appointment found", 400);
         }
         appointment.rescheduleProposals.push(proposal);
         await appointment.save();
@@ -70,24 +82,25 @@ export const handleProposeForRescheduleAppointment = handleAsyncHttp(
         res.success("Proposal sent", appointment);
     }
 );
-export const handleAcceptLastProposalForRescheduleAppointment = handleAsyncHttp(
+export const handleAcceptRescheduleProposalOfAppointment = handleAsyncHttp(
     async (req, res) => {
-        let appointment = await ClientAppointment.findById(req.body.id);
+        let appointment = await Appointment.findById(req.body.id);
         if (!appointment) {
             return res.error("No appointment", 400);
         }
-        const lastProposal =
-            appointment.rescheduleProposals[
-                appointment.rescheduleProposals.length - 1
-            ];
-        // if(lastProposal.from === "Provider" && req.headers.userId !== appointment.providerId.toString()){
-
-        // }
-        appointment.scheduleDate = lastProposal.scheduleDate;
-        appointment.timePeriod = lastProposal.timePeriod;
+        const proposal = appointment.rescheduleProposals.find(
+            (x) => x._id.toString() === req.body.proposalId
+        );
+        appointment.rescheduleProposals[
+            appointment.rescheduleProposals.length - 1
+        ];
+        if (!proposal) {
+            return res.error("Wrong proposal id");
+        }
+        appointment.scheduleDate = proposal.scheduleDate;
+        appointment.timePeriod = proposal.timePeriod;
         await appointment.save();
         //TODO: have to check for insertion
-        console.log(appointment);
         socketServer.emit(
             appointmentEvents.appointmentProposalAccept(
                 appointment._id.toString()
@@ -99,8 +112,8 @@ export const handleAcceptLastProposalForRescheduleAppointment = handleAsyncHttp(
 );
 
 export const handleAcceptAppointment = handleAsyncHttp(async (req, res) => {
-    //TODO: check provider or client
-    let appointment = await ClientAppointment.findById(req.body.id);
+    //TODO: check provider or
+    let appointment = await Appointment.findById(req.body.id);
     if (!appointment || appointment?.status === "Accepted") {
         return res.error("Already accepted");
     }
@@ -114,24 +127,26 @@ export const handleAcceptAppointment = handleAsyncHttp(async (req, res) => {
     res.success("Accepted", appointment);
 });
 export const handleRejectAppointment = handleAsyncHttp(async (req, res) => {
-    //TODO: check provider or client
-    let appointment = await ClientAppointment.findById(req.params.id);
-    if (!appointment || appointment?.status === "Accepted") {
-        return res.error("Already accepted");
+    //TODO: check provider or
+    let appointment = await Appointment.findById(req.body.id);
+    if (!appointment) {
+        return res.error("Already rejected");
     }
-    await ClientAppointment.findByIdAndDelete(appointment._id);
+    await Appointment.findOneAndUpdate(appointment._id, {
+        status: "Rejected",
+    });
     await sendUserNotification(
         appointment?.clientId.toString(),
         "Appointment rejected",
         appointment
     );
-    res.success("Rejected appointment", appointment);
+    res.success("Rejected appointment");
 });
 
 export const handleGetAppointmentList = handleAsyncHttp(async (req, res) => {
     res.success(
         "Appointment list",
-        await queryHelper(ClientAppointment, req.query, {
+        await queryHelper(Appointment, req.query, {
             populate: ["clientId", "providerId"],
         })
     );

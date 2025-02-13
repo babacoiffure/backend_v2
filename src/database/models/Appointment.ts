@@ -22,7 +22,7 @@ const fields = {
     },
     status: {
         type: String,
-        enums: ["Accepted", "Pending"],
+        enums: ["Accepted", "Pending", "Rejected"],
         default: "Pending",
     },
     rescheduleProposals: [
@@ -45,7 +45,7 @@ const fields = {
 
 // Exporting model
 export default model(
-    "ClientAppointment",
+    "Appointment",
     new Schema(fields, {
         timestamps: true,
     })
