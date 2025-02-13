@@ -16,6 +16,12 @@ export const serverENV = cleanEnv(process.env, {
     NODEMAILER_GMAIL_ID: str(),
     NODEMAILER_GMAIL_APP_PASSWORD: str(),
 
+    // cloudinary
+    CLOUDINARY_CLOUD_NAME: str(),
+    CLOUDINARY_API_KEY: str(),
+    CLOUDINARY_API_SECRET: str(),
+    CLOUDINARY_API_ENVIRONMENT_VARIABLE: str(),
+
     // tokens
     ACCESS_TOKEN_PRIVATE_KEY: str(),
     ACCESS_TOKEN_PUBLIC_KEY: str(),

@@ -1,13 +1,11 @@
 import { v2 as cloudinary } from "cloudinary";
-import { configDotenv } from "dotenv";
 import fs from "fs";
-import { serverConfigs } from "../env-config";
+import { serverConfigs, serverENV } from "../env-config";
 
-configDotenv();
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
+    cloud_name: serverENV.CLOUDINARY_CLOUD_NAME,
+    api_key: serverENV.CLOUDINARY_API_KEY,
+    api_secret: serverENV.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
 export const destroyImage = async (publicId: string) =>
