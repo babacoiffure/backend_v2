@@ -17,27 +17,18 @@ export const uploadImage = async (imagePath: string, folderName = "Photos") => {
     let data = await cloudinary.uploader.upload(imagePath, {
         folder: `${folderName}-${serverConfigs.app.name}`,
     });
-    await removeFile(imagePath);
+    removeFile(imagePath);
     return data;
 };
 
-export const removeFile = async (filePath: string) =>
+export const removeFile = (filePath: string) =>
     // Check if the file exists
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (err) {
             // File does not exist
-            console.log("File doesn't exists.");
-            return;
+            console.log("File doesn't exists with path " + filePath);
+        } else {
+            // File exists, proceed to delete it
+            fs.unlinkSync(filePath);
         }
-
-        // File exists, proceed to delete it
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                // Handle error during file deletion
-                console.log("Problem on deleting", err);
-                return;
-            }
-            // File deleted successfully
-            console.log("Successfully Deleted.");
-        });
     });

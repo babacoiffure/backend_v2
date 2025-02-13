@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
         cb(null, path.resolve(__dirname, "..", "..", "..", "uploads")); // Specify the destination folder
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Append the original extension
+        cb(null, Date.now() + "_" + file.originalname); // Append the original extension
     },
 });
 
@@ -67,9 +67,13 @@ fileUploadRouter.post(
                 single.path,
                 "service_images"
             );
-            uploads.single = {
-                publicId: public_id,
-                secureURL: secure_url,
+            console.log(public_id, "Plu");
+            uploads = {
+                ...uploads,
+                single: {
+                    publicId: public_id,
+                    secureURL: secure_url,
+                },
             };
         }
         res.success("Files uploaded...", {
