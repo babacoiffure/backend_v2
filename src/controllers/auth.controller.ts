@@ -6,6 +6,10 @@ import { handleAsyncHttp } from "../middleware/controller";
 import { configDotenv } from "dotenv";
 import { serverConfigs, serverENV } from "../env-config";
 import { sendEmail } from "../libraries/mailer";
+import {
+    createProviderExpressAccount,
+    getAccountLink,
+} from "../libraries/stripe";
 import { ErrorHandler } from "../middleware/error";
 import {
     generateAccessToken,
@@ -107,8 +111,60 @@ export const handleVerifyEmailWithOTP = handleAsyncHttp(async (req, res) => {
     }
     user.emailVerified = true;
     await user.save();
+
+    const _accessToken = generateAccessToken({
+        userId: user._id.toString(),
+        userType: user.userType.toString(),
+    });
+    const _refreshToken = generateRefreshToken({
+        userId: user._id.toString(),
+        userType: user.userType.toString(),
+    });
+    res.default.cookie("accessToken", _accessToken, {
+        httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.default.cookie("refreshToken", _refreshToken, {
+        httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+
+    if (user.userType === "Provider" && user.providerSettings) {
+        const providerStripeAccount = await createProviderExpressAccount(
+            user.email
+        );
+        user.providerSettings.stripeAccountId = providerStripeAccount.id;
+        await user.save();
+
+        const generateAccountLink = await getAccountLink(
+            providerStripeAccount.id
+        );
+
+        const mailOptions = {
+            to: email,
+            subject: `Stripe account for payment in <b>${serverConfigs.app.name}</b>`,
+            html: `<div>
+            <p>As a professional at <b>${serverConfigs.app.name}</b> . We have created an account on stripe to transfer your funds. Please clink on this given "Continue with Stripe" button or bellow link</p>
+            <br>
+            <button>
+            <a href="${generateAccountLink.url}"></a>
+            </button>
+            <br/>
+            <a>
+            ${generateAccountLink.url}
+            </a>
+            </div>`,
+        };
+        await sendEmail(mailOptions);
+        return res.success(
+            "You are Logged in. A stripe account is created for you to transfer funds. Please continue with that link."
+        );
+    }
+
     res.success(
-        "OTP matched for email verification. Your email now verified.",
+        "OTP matched for email verification. You are logged in with verified email.",
         null,
         200
     );

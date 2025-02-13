@@ -53,6 +53,11 @@ const fields = {
             default: "Confirmation",
             required: true,
         },
+        stripeAccountId: {
+            type: String,
+            default: "",
+            required: true,
+        },
     },
 };
 

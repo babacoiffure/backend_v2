@@ -3,6 +3,7 @@ import { cleanEnv, num, str } from "envalid";
 configDotenv();
 
 export const serverENV = cleanEnv(process.env, {
+    domain: str({ default: "http://localhost:9000" }),
     NODE_ENV: str({
         default: "development",
         choices: ["development", "test", "production", "staging"],
@@ -21,6 +22,9 @@ export const serverENV = cleanEnv(process.env, {
     CLOUDINARY_API_KEY: str(),
     CLOUDINARY_API_SECRET: str(),
     CLOUDINARY_API_ENVIRONMENT_VARIABLE: str(),
+
+    // stripe
+    STRIPE_SECRET_KEY: str(),
 
     // tokens
     ACCESS_TOKEN_PRIVATE_KEY: str(),
