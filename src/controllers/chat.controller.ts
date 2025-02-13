@@ -6,9 +6,10 @@ import { socketServer } from "../server";
 import { sendUserNotification } from "../service/notification.service";
 import queryHelper from "../utils/query-helper";
 export const handleGetChatByUserIds = handleAsyncHttp(async (req, res) => {
-    let chat = await Chat.findOne({ userIds: req.body.chatIds });
+    const query = { userIds: req.params.uidPair.split("-") };
+    let chat = await Chat.findOne(query);
     if (!chat) {
-        chat = await Chat.create({ userIds: req.body.userIds });
+        chat = await Chat.create(query);
     }
     res.success("Chat conversation", chat);
 });
@@ -32,32 +33,39 @@ export const handleSendChatMessage = handleAsyncHttp(async (req, res) => {
     res.success("message sent", message);
 });
 export const handleEditChatMessage = handleAsyncHttp(async (req, res) => {
-    const message = await ChatMassage.findByIdAndUpdate(
-        req.params.messageId,
-        req.body
-    );
+    let message = await ChatMassage.findByIdAndUpdate(req.params.id);
+    if (!message) {
+        return res.error("Message not found");
+    }
+    await ChatMassage.findByIdAndUpdate(req.params.messageId, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
     socketServer.emit(
-        chatEvents.chatMessageUpdated(req.params.chatId),
+        chatEvents.chatMessageUpdated(message.chatId?.toString()),
         message
     );
     // send notification by socket
     res.success("message updated", message);
 });
 export const handleDeleteChatMessage = handleAsyncHttp(async (req, res) => {
-    const message = await ChatMassage.findByIdAndDelete(req.params.messageId);
+    let message = await ChatMassage.findById(req.params.id);
+    if (!message) {
+        return res.error("Message not found");
+    }
+    await ChatMassage.findByIdAndDelete(req.params.id);
     socketServer.emit(
-        chatEvents.chatMessageDeleted(req.params.chatId),
-        "deleted"
+        chatEvents.chatMessageDeleted(message?.chatId.toString()),
+        message
     );
     // send notification by socket
-    res.success("message deleted", message);
+    res.success("message deleted");
 });
 export const handleGetChatList = handleAsyncHttp(async (req, res) => {
-    res.success("Chat list", await queryHelper(ChatMassage, { ...req.query }));
+    console.log("ERO");
+    res.success("Chat list", await queryHelper(Chat, req.query));
 });
 export const handleGetChatMessageList = handleAsyncHttp(async (req, res) => {
-    res.success(
-        "Message list",
-        await queryHelper(ChatMassage, { ...req.query })
-    );
+    res.success("Message list", await queryHelper(ChatMassage, req.query));
 });

@@ -3,6 +3,7 @@ const fields = {
     chatId: {
         type: mongoose.Schema.ObjectId,
         ref: "Chat",
+        required: true,
     },
     senderId: {
         type: mongoose.Schema.ObjectId,
@@ -16,23 +17,26 @@ const fields = {
     content: {
         text: {
             type: String,
-            default: "",
+            default: null,
         },
-        image: {
-            publicId: {
-                type: String,
-                required: true,
-                default: "",
+        images: [
+            {
+                publicId: {
+                    type: String,
+                    required: true,
+                    default: "",
+                },
+                secureURL: {
+                    type: String,
+                    default: "",
+                    required: true,
+                },
             },
-            secureURL: {
-                type: String,
-                required: true,
-                default: "",
-            },
-        },
-        appointment: {
+        ],
+        appointmentId: {
             type: mongoose.Schema.ObjectId,
-            default: "",
+            ref: "ClientAppointment",
+            default: null,
         },
     },
 };

@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
     handleDeleteChatMessage,
+    handleEditChatMessage,
+    handleGetChatByUserIds,
     handleGetChatList,
     handleGetChatMessageList,
     handleSendChatMessage,
@@ -8,11 +10,9 @@ import {
 
 export const chatRouter = Router();
 
+chatRouter.get("/by-ids/:uidPair", handleGetChatByUserIds);
 chatRouter.get("/list", handleGetChatList);
 chatRouter.get("/message/list", handleGetChatMessageList);
 chatRouter.post("/send-message", handleSendChatMessage);
-chatRouter.patch("/edit-message/:chatId/:messageId", handleSendChatMessage);
-chatRouter.delete(
-    "/delete-message/:chatId/:messageId",
-    handleDeleteChatMessage
-);
+chatRouter.patch("/edit-message/:id", handleEditChatMessage);
+chatRouter.delete("/delete-message/:id", handleDeleteChatMessage);
