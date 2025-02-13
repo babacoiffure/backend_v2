@@ -13,12 +13,11 @@ const fields = {
             enums: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
         },
     ],
-    availableAt: [
-        {
-            type: String,
-            enum: ["Provider", "Client", "No Matter"],
-        },
-    ],
+    availableAt: {
+        type: String,
+        enum: ["Provider", "Client", "No Matter"],
+        required: true,
+    },
     timePeriods: [
         {
             type: String,

@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { handleSaveProviderSchedule } from "../../controllers/provider-schedule.controller";
+import {
+    handleGetProviderSchedule,
+    handleSaveProviderSchedule,
+} from "../../controllers/provider-schedule.controller";
 
 export const providerScheduleRouter = Router();
-providerScheduleRouter.post("/user/:userId/save", handleSaveProviderSchedule);
+providerScheduleRouter.get("/user/:userId", handleGetProviderSchedule);
+providerScheduleRouter.post("/save", handleSaveProviderSchedule);
