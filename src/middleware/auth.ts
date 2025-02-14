@@ -16,13 +16,17 @@ export const authenticateJWT = async (
     let accessToken = req.cookies["accessToken"];
 
     if (!accessToken) {
-        return next(new ErrorHandler("Access token is empty", 401));
+        return next(
+            new ErrorHandler("Unauthorized access. Please login first.", 401)
+        );
     }
-    const { valid, decoded }: { valid: boolean; decoded: any } =
-        verifyAccessToken(accessToken);
+    const { valid, decoded, expired } = verifyAccessToken(accessToken);
+    if (expired) {
+        return next(new ErrorHandler("Token expired", 403));
+    }
 
-    if (!valid) {
-        return next(new ErrorHandler("Invalid token", 403));
+    if (!valid || !decoded) {
+        return next(new ErrorHandler("Invalid token. Please sign in.", 401));
     }
     req.headers.userId = decoded.userId;
     req.headers.userType = decoded.userType;

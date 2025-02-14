@@ -170,25 +170,51 @@ export const handleVerifyEmailWithOTP = handleAsyncHttp(async (req, res) => {
     );
 });
 
-export const handleRefreshToken = handleAsyncHttp(async (req, res) => {
+export const handleReissueToken = handleAsyncHttp(async (req, res) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-        throw new ErrorHandler("Forbidden: no refresh token", 401);
+        throw new ErrorHandler("Unauthorized request", 401);
     }
     const { valid, decoded } = verifyRefreshToken(refreshToken);
     if (!valid || !decoded?.userType || !decoded.userId) {
-        throw new ErrorHandler("Invalid refresh token", 401);
+        throw new ErrorHandler("Token expired or invalid refresh token", 403);
     }
-    const newAccessToken = generateAccessToken({
-        userId: decoded?.userId,
-        userType: decoded?.userType,
+    const _accessToken = generateAccessToken({
+        userId: decoded.userId.toString(),
+        userType: decoded.userType.toString(),
     });
-    res.default.cookie("accessToken", newAccessToken, {
-        sameSite: "strict",
-        secure: serverENV.NODE_ENV === "production",
+    const _refreshToken = generateRefreshToken({
+        userId: decoded.userId.toString(),
+        userType: decoded.userType.toString(),
+    });
+    res.default.cookie("accessToken", _accessToken, {
         httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
     });
-    res.success("Token refreshed", { refreshToken });
+    res.default.cookie("refreshToken", _refreshToken, {
+        httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.success("Token reissued", {
+        refreshToken: _refreshToken,
+        accessToken: _accessToken,
+    });
+});
+
+export const handleSignOut = handleAsyncHttp(async (req, res) => {
+    res.default.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.default.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: serverENV.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.success("You are signout.");
 });
 
 // Handle Password reset

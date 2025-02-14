@@ -3,7 +3,9 @@ import {
     handleCredentialSignIn,
     handleCredentialSignUp,
     handleForgotPassword,
+    handleReissueToken,
     handleResetPassword,
+    handleSignOut,
     handleVerifyEmailWithOTP,
     handleVerifyOTP,
 } from "../../controllers/auth.controller";
@@ -16,3 +18,5 @@ authRouter.post("/credential/sign-in", handleCredentialSignIn);
 authRouter.post("/forgot-password", handleForgotPassword);
 authRouter.post("/verify-identity-with-otp", handleVerifyOTP);
 authRouter.post("/reset-password", handleResetPassword);
+authRouter.get("/reissue-auth-token", handleReissueToken);
+authRouter.get("/sign-out", handleSignOut);
