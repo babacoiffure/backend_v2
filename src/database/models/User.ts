@@ -51,12 +51,10 @@ const fields = {
             type: String,
             enums: ["Regular", "Pre-deposit", "Confirmation"],
             default: "Confirmation",
-            required: true,
         },
         stripeAccountId: {
             type: String,
             default: "",
-            required: true,
         },
     },
 };

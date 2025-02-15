@@ -49,9 +49,7 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
     user.OTP = OTP;
     await user.save();
     res.success(
-        "User signup successful!\nWe send a mail with OTP to verify your mail.Please verify your mail before logging in.",
-        await User.findById(user._id),
-        200
+        "User signup successful!\nWe send a mail with OTP to verify your mail.Please verify your mail before logging in."
     );
 });
 
