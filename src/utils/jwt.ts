@@ -21,6 +21,7 @@ export function signJwt(
 export function verifyJwt<TokenSchema>(token: string, publicKey: string) {
     try {
         const decoded: any = jwt.verify(token, publicKey);
+        // console.log(decoded.exp, Date.now());
         return {
             valid: true,
             expired: decoded?.exp < Date.now(),

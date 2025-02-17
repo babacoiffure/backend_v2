@@ -21,9 +21,10 @@ export const authenticateJWT = async (
         );
     }
     const { valid, decoded, expired } = verifyAccessToken(accessToken);
-    if (expired) {
-        return next(new ErrorHandler("Token expired", 403));
-    }
+    console.log(expired);
+    // if (expired) {
+    //     return next(new ErrorHandler("Token expired", 403));
+    // }
 
     if (!valid || !decoded) {
         return next(new ErrorHandler("Invalid token. Please sign in.", 401));
