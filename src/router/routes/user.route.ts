@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import {
     handleGetUserList,
+    handleHandleGetUserById,
     handleUpdateUserInfo,
 } from "../../controllers/user.controller";
 export const userRouter = Router();
@@ -48,3 +49,4 @@ userRouter.post(
 );
 
 userRouter.get("/list", handleGetUserList);
+userRouter.get("/by-id/:id", handleHandleGetUserById);
