@@ -105,7 +105,7 @@ export const handleVerifyEmailWithOTP = handleAsyncHttp(async (req, res) => {
     const user = await User.findOne({
         email,
         userType,
-    });
+    }).select("+OTP");
 
     if (!user) {
         return res.error("User not identified by this email and userType", 404);
@@ -253,6 +253,7 @@ export const handleForgotPassword = handleAsyncHttp(async (req, res) => {
 export const handleVerifyOTP = handleAsyncHttp(async (req, res) => {
     const { OTP, userType, email } = req.body;
     const user = await User.findOne({ email, userType }).select("+OTP");
+
     console.log(user?.OTP, OTP);
     if (!user) {
         throw new ErrorHandler("No user found!", 400);
