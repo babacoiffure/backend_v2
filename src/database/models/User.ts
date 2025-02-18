@@ -15,7 +15,6 @@ const fields = {
     email: {
         type: String,
         required: true,
-        unique: true,
     },
     avatar: {
         publicId: {
