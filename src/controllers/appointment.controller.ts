@@ -3,6 +3,7 @@ import Appointment from "../database/models/Appointment";
 import User from "../database/models/User";
 import { handleAsyncHttp } from "../middleware/controller";
 import { socketServer } from "../server";
+import { acceptAppointmentById } from "../service/appointment.service";
 import { sendUserNotification } from "../service/notification.service";
 import queryHelper from "../utils/query-helper";
 import { getDayMatchQuery } from "../utils/utils";
@@ -17,21 +18,30 @@ export const handleMakeAppointment = handleAsyncHttp(async (req, res) => {
         return res.error("The timePeriod of this schedule already taken.", 400);
     }
 
-    // const isAlreadyTakeAnAppointment = await Appointment.findOne({
-    //     scheduleDate: getDayMatchQuery(req.body.scheduleDate),
-    //     timePeriod: req.body.timePeriod,
-    //     clientId:req.body.clientId
-    // });
-
-    // if (isAlreadyTakeAnAppointment) {
-    //     return res.error("The timePeriod of this schedule already taken.", 400);
-    // }
-
     const provider = await User.findById(req.body.providerId);
     const appointmentMode = provider?.providerSettings?.appointmentMode;
-    if (appointmentMode === "Pre-deposit") {
-        // check the token give in req.body. and after payment we will save the payment record in payment model. and we give a trx token. we have to validate this trx token here
-    }
+    // if (appointmentMode === "Pre-deposit") {
+    //     // already payment done
+    //     const payment = await Payment.findOne({
+    //         clientId: req.body.clientId,
+    //         providerServiceId: req.body.providerServiceId,
+    //         status: "Pre-deposit",
+    //     });
+    //     if (!payment) {
+    //         return res.error("Pre-deposit not done yet.", 400);
+    //     }
+    // } else if (appointmentMode === "Regular") {
+    //     // already payment done
+    //     const payment = await Payment.findOne({
+    //         clientId: req.body.clientId,
+    //         providerServiceId: req.body.providerServiceId,
+    //         status: "Paid",
+    //     });
+    //     if (!payment) {
+    //         return res.error("Full payment is not done yet.", 400);
+    //     }
+    // }
+
     const appointment = await Appointment.create({
         status: appointmentMode === "Confirmation" ? "Pending" : "Accepted",
         ...req.body,
@@ -113,17 +123,7 @@ export const handleAcceptRescheduleProposalOfAppointment = handleAsyncHttp(
 
 export const handleAcceptAppointment = handleAsyncHttp(async (req, res) => {
     //TODO: check provider or
-    let appointment = await Appointment.findById(req.body.id);
-    if (!appointment || appointment?.status === "Accepted") {
-        return res.error("Already accepted");
-    }
-    appointment.status = "Accepted";
-    await appointment.save();
-    await sendUserNotification(
-        appointment?.clientId.toString(),
-        "Appointment accepted",
-        appointment
-    );
+    const appointment = await acceptAppointmentById(req.body.id);
     res.success("Accepted", appointment);
 });
 export const handleRejectAppointment = handleAsyncHttp(async (req, res) => {
