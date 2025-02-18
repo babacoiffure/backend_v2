@@ -24,7 +24,7 @@ export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
     const { name, email, userType, password } = req.body;
     const isExists = await User.findOne({ email, userType });
     if (isExists) {
-        throw new ErrorHandler("User Already exists", 409);
+        await User.findByIdAndDelete(isExists._id);
     }
 
     const user = await User.create({
