@@ -22,9 +22,15 @@ configDotenv();
 
 export const handleCredentialSignUp = handleAsyncHttp(async (req, res) => {
     const { name, email, userType, password } = req.body;
-    const isExists = await User.findOne({ email, userType });
-    if (isExists) {
+    const isExists = await User.findOne({
+        email,
+        userType,
+    });
+    if (isExists && isExists.emailVerified === false) {
         await User.findByIdAndDelete(isExists._id);
+    }
+    if (isExists && isExists.emailVerified) {
+        return res.error("Already have an verified account.");
     }
 
     const user = await User.create({
@@ -108,6 +114,7 @@ export const handleVerifyEmailWithOTP = handleAsyncHttp(async (req, res) => {
         return res.error("Wrong OTP", 400);
     }
     user.emailVerified = true;
+    user.OTP = "";
     await user.save();
 
     const _accessToken = generateAccessToken({
@@ -246,6 +253,7 @@ export const handleForgotPassword = handleAsyncHttp(async (req, res) => {
 export const handleVerifyOTP = handleAsyncHttp(async (req, res) => {
     const { OTP, userType, email } = req.body;
     const user = await User.findOne({ email, userType }).select("+OTP");
+    console.log(user?.OTP, OTP);
     if (!user) {
         throw new ErrorHandler("No user found!", 400);
     }
