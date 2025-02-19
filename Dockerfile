@@ -5,23 +5,23 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install global dependencies
-RUN npm install -g typescript ts-node
+RUN pnpm install -g typescript ts-node
 
 # Copy package files
 COPY package*.json ./
 
 # Install production dependencies
 FROM base AS deps
-RUN npm i --only=production
+RUN pnpm i --only=production
 
 # Build stage
 FROM base AS builder
 # Install all dependencies for building
-RUN npm i
+RUN pnpm i
 # Copy source files
 COPY . .
 # Build TypeScript to JavaScript
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
 FROM node:20-alpine AS production
@@ -47,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 	CMD node -e "require('http').get('http://localhost:3000/health', (res) => { if (res.statusCode !== 200) throw new Error('Health check failed'); })" || exit 1
 
 # Run the application
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
