@@ -12,7 +12,7 @@ COPY package*.json ./
 
 # Install production dependencies
 FROM base AS deps
-RUN npm ci --only=production
+RUN npm i --only=production
 
 # Build stage
 FROM base AS builder
