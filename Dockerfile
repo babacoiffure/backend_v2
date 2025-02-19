@@ -1,10 +1,6 @@
 # Use official Node.js LTS image as base
 FROM node:20-alpine AS base
 
-# Install pnpm and global dependencies in one step
-RUN npm install -g pnpm && \
-	pnpm install -g typescript ts-node
-
 # Set working directory
 WORKDIR /app
 
@@ -13,16 +9,16 @@ COPY package*.json ./
 
 # Install production dependencies
 FROM base AS deps
-RUN pnpm i --only=production
+RUN npm install --only=production
 
 # Build stage
 FROM base AS builder
 # Install all dependencies for building
-RUN pnpm i
+RUN npm install
 # Copy source files
 COPY . .
 # Build TypeScript to JavaScript
-RUN pnpm run build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS production
@@ -37,6 +33,9 @@ COPY --from=builder /app/dist ./dist
 # Copy package.json for potential runtime needs
 COPY package.json ./
 
+# Install global TypeScript and ts-node
+RUN npm install -g typescript ts-node
+
 # Set environment to production
 ENV NODE_ENV=production
 
@@ -48,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 	CMD node -e "require('http').get('http://localhost:3000/health', (res) => { if (res.statusCode !== 200) throw new Error('Health check failed'); })" || exit 1
 
 # Run the application
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
