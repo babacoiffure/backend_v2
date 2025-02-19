@@ -25,7 +25,7 @@ jobs:
         run: echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
 
       - name: Login to Container Registry
-        run: docker login ${{ secrets.CONTAINER_REGISTRY }} -u nologin --password-stdin <<< ${{ secrets.REGISTRY_API_KEY }}
+        run: docker login ${{ secrets.CONTAINER_REGISTRY }} -u nologin --password-stdin <<< ${{ secrets.SCW_SECRET_KEY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
