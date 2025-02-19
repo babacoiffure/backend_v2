@@ -1,14 +1,12 @@
 # Use official Node.js LTS image as base
 FROM node:20-alpine AS base
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm and global dependencies in one step
+RUN npm install -g pnpm && \
+	pnpm install -g typescript ts-node
 
 # Set working directory
 WORKDIR /app
-
-# Install global dependencies
-RUN pnpm install -g typescript ts-node
 
 # Copy package files
 COPY package*.json ./
