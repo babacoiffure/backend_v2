@@ -12,6 +12,11 @@ const fields = {
         ref: "User",
         required: true,
     },
+    providerServiceId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "ProviderService",
+        required: true,
+    },
     scheduleDate: {
         type: Date,
         required: true,
@@ -25,6 +30,35 @@ const fields = {
         enums: ["Accepted", "Pending", "Rejected"],
         default: "Pending",
     },
+
+    selectedAddons: [
+        {
+            name: {
+                type: String,
+                required: true,
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+        },
+    ],
+    selectedSizeBasedAddons: [
+        {
+            name: {
+                type: String,
+                required: true,
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+            size: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
     rescheduleProposals: [
         {
             from: {
