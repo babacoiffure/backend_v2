@@ -1,6 +1,9 @@
 # Use official Node.js LTS image as base
 FROM node:20-alpine AS base
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Set working directory
 WORKDIR /app
 
