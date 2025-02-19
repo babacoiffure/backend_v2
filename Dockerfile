@@ -17,7 +17,7 @@ RUN npm ci --only=production
 # Build stage
 FROM base AS builder
 # Install all dependencies for building
-RUN npm ci
+RUN npm i
 # Copy source files
 COPY . .
 # Build TypeScript to JavaScript
